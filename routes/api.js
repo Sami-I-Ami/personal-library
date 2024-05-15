@@ -73,7 +73,7 @@ module.exports = function (app) {
   app.route('/api/books/:id')
     .get(function (req, res){
       let bookid = req.params.id;
-      Book.findOne({_id: bookid}, (err, book) => {
+      Book.findById(bookid, (err, book) => {
         if (err) {
           res.send("error finding book");
           return console.log(err);
@@ -98,7 +98,7 @@ module.exports = function (app) {
         res.send("missing required field comment");
         return;
       }
-      Book.findOne({_id: bookid}, (err, book) => {
+      Book.findById(bookid, (err, book) => {
         if (err) {
           res.send("error finding book");
           return console.log(err);
@@ -108,6 +108,17 @@ module.exports = function (app) {
           return;
         }
         book.comments.push(comment);
+        let successfulSave = true;
+        book.save((err) => {
+          if (err) {
+            res.send("error saving new comment");
+            successfulSave = false;
+            return console.log(err);
+          }
+        });
+        if (!successfulSave) {
+          return;
+        }
         const bookData = {
           _id: book._id,
           title: book.title,
@@ -115,7 +126,6 @@ module.exports = function (app) {
         };
         res.json(bookData);
       });
-      //json res format same as .get
     })
     
     .delete(function(req, res){
