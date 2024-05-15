@@ -73,10 +73,6 @@ module.exports = function (app) {
   app.route('/api/books/:id')
     .get(function (req, res){
       let bookid = req.params.id;
-      if (!bookid) {
-        res.send("no book exists");
-        return;
-      }
       Book.findOne({_id: bookid}, (err, book) => {
         if (err) {
           res.send("error finding book");
@@ -98,6 +94,27 @@ module.exports = function (app) {
     .post(function(req, res){
       let bookid = req.params.id;
       let comment = req.body.comment;
+      if (!comment) {
+        res.send("missing required field comment");
+        return;
+      }
+      Book.findOne({_id: bookid}, (err, book) => {
+        if (err) {
+          res.send("error finding book");
+          return console.log(err);
+        }
+        if (!book) {
+          res.send("no book exists");
+          return;
+        }
+        book.comments.push(comment);
+        const bookData = {
+          _id: book._id,
+          title: book.title,
+          comments: book.comments
+        };
+        res.json(bookData);
+      });
       //json res format same as .get
     })
     
