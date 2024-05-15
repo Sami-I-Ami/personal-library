@@ -23,8 +23,16 @@ module.exports = function (app) {
 
   app.route('/api/books')
     .get(function (req, res){
-      //response will be array of book objects
-      //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
+      Book.find({}, (err, books) => {
+        const bookList = books.map((book) => {
+          return {
+            _id: book._id,
+            title: book.title,
+            commentcount: book.comments.length
+          }
+        });
+        res.json(bookList);
+      });
     })
     
     .post(function (req, res){
@@ -34,7 +42,7 @@ module.exports = function (app) {
         return;
       }
       const newBook = new Book({title, comments: []});
-      newBook.save((err, data) => {
+      newBook.save((err) => {
         if (err) {
           res.send("error occured saving book");
           return console.log(err);
@@ -44,8 +52,6 @@ module.exports = function (app) {
           title: newBook.title
         });
       })
-    
-      //response will contain new book object including atleast _id and title
     })
     
     .delete(function(req, res){
