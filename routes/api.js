@@ -7,6 +7,17 @@
 */
 
 'use strict';
+require('dotenv').config();
+const mongoose = require("mongoose");
+const uri = process.env.DB;
+const db = mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true});
+
+const Schema = mongoose.Schema;
+const bookSchema = new Schema({
+  title: {type: String, required: true},
+  comments: [String]
+});
+const Book = mongoose.model("Book", bookSchema);
 
 module.exports = function (app) {
 
@@ -18,6 +29,22 @@ module.exports = function (app) {
     
     .post(function (req, res){
       let title = req.body.title;
+      if (!title) {
+        res.send("missing required field title");
+        return;
+      }
+      const newBook = new Book({title, comments: []});
+      newBook.save((err, data) => {
+        if (err) {
+          res.send("error occured saving book");
+          return console.log(err);
+        };
+        res.json({
+          _id: newBook._id,
+          title: newBook.title
+        });
+      })
+    
       //response will contain new book object including atleast _id and title
     })
     
