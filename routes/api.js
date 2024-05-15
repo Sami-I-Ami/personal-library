@@ -24,6 +24,10 @@ module.exports = function (app) {
   app.route('/api/books')
     .get(function (req, res){
       Book.find({}, (err, books) => {
+        if (err) {
+          res.send("error occured finding books");
+          return console.log(err);
+        }
         const bookList = books.map((book) => {
           return {
             _id: book._id,
@@ -55,7 +59,13 @@ module.exports = function (app) {
     })
     
     .delete(function(req, res){
-      //if successful response will be 'complete delete successful'
+      Book.deleteMany({}, (err) => {
+        if (err) {
+          res.send("error occured deleting books");
+          return console.log(err);
+        }
+        res.send("complete delete successful");
+      });
     });
 
 
