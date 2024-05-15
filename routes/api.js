@@ -75,7 +75,7 @@ module.exports = function (app) {
       let bookid = req.params.id;
       Book.findById(bookid, (err, book) => {
         if (err) {
-          res.send("error finding book");
+          res.send("error occured finding book");
           return console.log(err);
         }
         if (!book) {
@@ -100,7 +100,7 @@ module.exports = function (app) {
       }
       Book.findById(bookid, (err, book) => {
         if (err) {
-          res.send("error finding book");
+          res.send("error occurred finding book");
           return console.log(err);
         }
         if (!book) {
@@ -130,7 +130,17 @@ module.exports = function (app) {
     
     .delete(function(req, res){
       let bookid = req.params.id;
-      //if successful response will be 'delete successful'
+      Book.findByIdAndDelete(bookid, (err, book) => {
+        if (err) {
+          res.send("error occured finding book");
+          return console.log(err);
+        }
+        if (!book) {
+          res.send("no book exists");
+          return;
+        }
+        res.send("delete successful");
+      });
     });
   
 };
